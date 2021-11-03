@@ -1,56 +1,34 @@
-const faker = require('faker');
-
+/* const boom = require('@hapi/boom'); */
+const { models } = require('../libs/sequelize');
+const boom = require('@hapi/boom');
 class UserService {
-  constructor() {
-    this.users = [];
-    this.generate();
+  constructor() {}
+  async create(data) {
+    const newUser = await models.User.create(data);
+    return newUser;
   }
-  generate() {
-    const limit = 100;
-    for (let index = 0; index < limit; index++) {
-      this.users.push({
-        id: faker.datatype.uuid(),
-        name: faker.name.findName(),
-        email: faker.internet.email(),
-        address: faker.address.streetAddress(),
-        image: faker.image.people(90, 90),
-      });
+  async find() {
+    const rta = await models.User.findAll({
+      include: ['customer'],
+    });
+    return rta;
+  }
+  async findOne(id) {
+    const user = await models.User.findByPk(id);
+    if (!user) {
+      throw boom.notFound('user not found');
     }
+    return user;
   }
-  create(data) {
-    const newProduct = {
-      id: faker.datatype.uuid(),
-      ...data,
-    };
-    this.users.push(newProduct);
-    return {
-      newProduct,
-    };
+  async update(id, changes) {
+    const user = await this.findOne(id);
+    const rta = await user.update(changes);
+    return rta;
   }
-  find() {
-    return this.users;
-  }
-  findOne(id) {
-    return this.users.find((item) => item.id === id);
-  }
-  update(id, changes) {
-    const index = this.users.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new Error('user not found');
-    } else {
-      this.users[index] = { ...this.users[index], ...changes };
-
-      return this.users[index];
-    }
-  }
-  delete(id) {
-    const index = this.users.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new Error('user not found');
-    } else {
-      this.users.slice(index, 1);
-      return { message: 'usuario eliminado con éxito' };
-    }
+  async delete(id) {
+    const user = await this.findOne(id);
+    await user.destroy();
+    return id;
   }
 }
 

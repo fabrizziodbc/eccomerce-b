@@ -1,44 +1,80 @@
 const express = require('express');
 const UserService = require('../services/usersService');
+const validatorHandler = require('../middlewares/validatorHandler');
+const {
+  createUserSchema,
+  updateUserSchema,
+  getUserSchema,
+} = require('../schemas/userSchema');
+
 const router = express.Router();
 const service = new UserService();
 //Todos los usuario
-router.get('/', (req, res) => {
-  const users = service.find();
-  res.json(users);
+router.get('/', async (req, res, next) => {
+  try {
+    const users = await service.find();
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
 });
 //Usuario según ID
-router.get('/:id', (req, res) => {
-  const { id } = req.params;
-  const user = service.findOne(id);
-  res.json(user);
-});
+router.get(
+  '/:id',
+  validatorHandler(getUserSchema, 'params'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const user = await service.findOne(id);
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 //Nuevo usuario
-router.post('/', (req, res) => {
-  const body = req.body;
-  const createUser = service.create(body);
-  res.json({
-    message: 'created',
-    data: createUser,
-  });
-});
+router.post(
+  '/',
+  validatorHandler(createUserSchema, 'body'),
+  async (req, res, next) => {
+    try {
+      const body = req.body;
+      const createUser = await service.create(body);
+      res.json({
+        message: 'created',
+        data: createUser,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 //Modificar usuario
-router.patch('/:id', (req, res) => {
-  const { id } = req.params;
-  const body = req.body;
-  const user = service.update(id, body);
-  res.json({
-    message: 'updated',
-    data: user,
-  });
-});
+router.patch(
+  '/:id',
+  validatorHandler(getUserSchema, 'params'),
+  validatorHandler(updateUserSchema, 'body'),
+  async (req, res) => {
+    const { id } = req.params;
+    const body = req.body;
+    const user = await service.update(id, body);
+    res.json({
+      message: 'updated',
+      data: user,
+    });
+  }
+);
 //Eliminar usuario
-router.delete('/:id', (req, res) => {
-  const { id } = req.params;
-  const userDelete = service.delete(id);
-  res.json({
-    userDelete,
-  });
-});
+router.delete(
+  '/:id',
+  validatorHandler(getUserSchema, 'params'),
+  async (req, res) => {
+    const { id } = req.params;
+    const userDelete = await service.delete(id);
+    res.json({
+      userDelete,
+    });
+  }
+);
 
 module.exports = router;
