@@ -42,6 +42,29 @@ module.exports = {
         defaultValue: Sequelize.NOW,
       },
     });
+    await queryInterface.createTable(CATEGORY_TABLE, {
+      id: {
+        allowdNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
+      name: {
+        allowdNull: false,
+        type: DataTypes.STRING,
+        unique: true,
+      },
+      image: {
+        allowdNull: false,
+        type: DataTypes.STRING,
+      },
+      createAt: {
+        allowdNull: false,
+        type: DataTypes.DATE,
+        field: 'create_at',
+        defaultValue: Sequelize.NOW,
+      },
+    });
     await queryInterface.createTable(PRODUCT_TABLE, {
       id: {
         allowdNull: false,
@@ -122,29 +145,7 @@ module.exports = {
         onDelete: 'SET NULL',
       },
     });
-    await queryInterface.createTable(CATEGORY_TABLE, {
-      id: {
-        allowdNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER,
-      },
-      name: {
-        allowdNull: false,
-        type: DataTypes.STRING,
-        unique: true,
-      },
-      image: {
-        allowdNull: false,
-        type: DataTypes.STRING,
-      },
-      createAt: {
-        allowdNull: false,
-        type: DataTypes.DATE,
-        field: 'create_at',
-        defaultValue: Sequelize.NOW,
-      },
-    });
+
     await queryInterface.createTable(ORDER_TABLE, {
       id: {
         allowdNull: false,
