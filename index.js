@@ -1,6 +1,8 @@
 const express = require('express');
+const passport = require('passport');
 const cors = require('cors');
 const routerApi = require('./routes');
+const { checkApiKey } = require('./middlewares/authHandler');
 
 const {
   logErrors,
@@ -23,6 +25,8 @@ const options = {
   },
 };
 app.use(cors(options));
+app.use(passport.initialize());
+require('./utils/auth');
 
 routerApi(app);
 
@@ -31,7 +35,7 @@ app.use(ormErrorHandler);
 app.use(boomErrorHandler);
 app.use(errorHandler);
 
-app.get('/', (req, res) => {
+app.get('/', checkApiKey, (req, res) => {
   res.send('Hola, mi server de express');
 });
 

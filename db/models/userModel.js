@@ -18,6 +18,11 @@ const UserSchema = {
     allowdNull: false,
     type: DataTypes.STRING,
   },
+  recoveryToken: {
+    field: 'recovery_token',
+    allowdNull: true,
+    type: DataTypes.STRING,
+  },
   image: {
     allowdNull: false,
     type: DataTypes.STRING,

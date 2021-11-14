@@ -4,7 +4,18 @@ const boom = require('@hapi/boom');
 class OrdersService {
   constructor() {}
   async create(data) {
+    console.log(data);
     const newOrder = await models.Order.create(data);
+    return newOrder;
+  }
+  async createFromProfile(data) {
+    const user = await models.Customer.findOne({
+      where: {
+        user_id: data.customerId,
+      },
+    });
+    const customer = user.id;
+    const newOrder = await models.Order.create({ customerId: customer });
     return newOrder;
   }
   async addItem(data) {
@@ -13,6 +24,20 @@ class OrdersService {
   }
   async find() {
     const orders = await models.Order.findAll({ include: ['customer'] });
+    return orders;
+  }
+  async findByUser(userId) {
+    const orders = await models.Order.findAll({
+      where: {
+        '$customer.user.id$': userId,
+      },
+      include: [
+        {
+          association: 'customer',
+          include: ['user'],
+        },
+      ],
+    });
     return orders;
   }
 
